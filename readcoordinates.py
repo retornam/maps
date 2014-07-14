@@ -1,5 +1,7 @@
+from geojson import Feature, Point,FeatureCollection
 import csv
 import sys
+import json
 
 
 def open_csvfile(filename, newfilename):
@@ -7,8 +9,14 @@ def open_csvfile(filename, newfilename):
         f = open(filename, 'rb')
         r = open(newfilename, 'wb')
         reader = csv.reader(f)
+        features =[]
         for row in reader:
-            r.write("%s,%s\n" %(row[2], row[3]))
+            #coordinate data is from google maps to mapbox 
+            #we need to flip the x and y coordinates
+            x  = float(row[2])
+            y= float(row[3])
+            features.append(Feature(geometry=Point((y, x))))
+        json.dump(FeatureCollection(features),r)
     except IOError as e:
         print "I/O error({0}): {1}".format(e.errno, e.strerror)
     finally:
